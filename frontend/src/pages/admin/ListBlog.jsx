@@ -3,6 +3,7 @@ import { blog_data } from '../../assets/assets';
 import BlogTableItem from '../../components/admin/BlogTableItem';
 import { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
+import toast from 'react-hot-toast';
 
 
 const ListBlog = () => {
