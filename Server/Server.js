@@ -4,14 +4,19 @@ import cors from 'cors'
 import connectDB from './configs/db.js';
 import adminRouter from './routes/adminRoutes.js';
 import blogRouter from './routes/blogRoutes.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
 await connectDB()
 
 //Middleware
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:5173',  // ✅ frontend origin
+  credentials: true                 // ✅ allow cookies
+}))
 app.use(express.json())
+app.use(cookieParser());
 
 //Routes
 app.get('/', (req, res)=> res.send("API is working"))
