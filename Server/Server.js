@@ -14,7 +14,7 @@ await connectDB()
 
 //Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',  // ✅ frontend origin
+  origin: 'https://ai-blog-generator-frontend-3rc9.onrender.com',  // ✅ frontend origin
   credentials: true                 // ✅ allow cookies
 }))
 app.use(express.json())
