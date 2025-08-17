@@ -12,25 +12,39 @@ const app = express();
 
 await connectDB()
 
-//Middleware
-app.use(cors({
-  origin: 'https://ai-blog-generator-frontend-3rc9.onrender.com',  // ✅ frontend origin
-  credentials: true                 // ✅ allow cookies
-}))
+
+// --- CORS (put FIRST) ---
+const allowedOrigins = (process.env.CORS_ORIGINS ??
+  'https://ai-blog-generator-frontend-3rc9.onrender.com,http://localhost:5173'
+).split(',').map(s => s.trim());
+
+const corsOptions = {
+  origin(origin, cb) {
+    if (!origin) return cb(null, true); // allow server-to-server/curl
+    return allowedOrigins.includes(origin)
+      ? cb(null, true)
+      : cb(new Error(`Not allowed by CORS: ${origin}`));
+  },
+  credentials: false, // you use Bearer token (NOT cookies)
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+// make Express handle preflight with proper headers + 204
+app.options('*', cors(corsOptions));
+
+
+// //Middleware
+// app.use(cors({
+//   origin: 'https://ai-blog-generator-frontend-3rc9.onrender.com',  // ✅ frontend origin
+//   credentials: true                 // ✅ allow cookies
+// }))
+//  Body & misc 
 app.use(express.json())
 app.use(cookieParser());
 
-// // Needed when using ES modules to get __dirname
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
-// // Serve static files from public directory
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// // Optional: Serve favicon explicitly (not required if using express.static)
-// app.get('/favicon.ico', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
-// });
 
 //Routes
 app.get('/', (req, res)=> res.send("API is working"))
@@ -39,7 +53,7 @@ app.use('/api/blog', blogRouter)
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, ()=>{
+app.listen(PORT, '0.0.0.0', ()=>{
     console.log('server is running on port ' + PORT)
 })
 
